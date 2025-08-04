@@ -8,7 +8,6 @@
         <class>vn.edu.eiu.lab5.model.Customer</class>
         <class>vn.edu.eiu.lab5.model.Product</class>
         <class>vn.edu.eiu.lab5.model.Invoice</class>
-        <class>vn.edu.eiu.lab5.model.InvoiceItem</class>
         <properties>
             <!-- Database connection properties -->
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/electronic_sales?createDatabaseIfNotExist=true"/>

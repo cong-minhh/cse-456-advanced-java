@@ -3,8 +3,7 @@ package vn.edu.eiu.lab5.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "invoices")
@@ -23,11 +22,27 @@ public class Invoice {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
     
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InvoiceItem> items = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
     
-    @Transient
-    private BigDecimal totalAmount;
+    @Column(name = "quantity", nullable = false)
+    private int quantity;
+    
+    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal unitPrice;
+    
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
+    
+    public void calculateTotal() {
+        if (product != null && quantity > 0) {
+            this.unitPrice = product.getPrice();
+            this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        } else {
+            this.totalPrice = BigDecimal.ZERO;
+        }
+    }
 
     // Constructors
     public Invoice() {
@@ -41,23 +56,18 @@ public class Invoice {
     }
 
     // Business methods
-    public void addItem(Product product, int quantity) {
-        InvoiceItem item = new InvoiceItem(product, quantity);
-        items.add(item);
-        item.setInvoice(this);
-    }
-    
     public BigDecimal getTotalAmount() {
-        if (totalAmount == null) {
-            totalAmount = items.stream()
-                    .map(InvoiceItem::getTotalPrice)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (totalPrice == null) {
+            calculateTotal();
         }
-        return totalAmount;
+        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
     }
     
     private String generateInvoiceNumber() {
-        return "INV-" + System.currentTimeMillis();
+        if (invoiceNumber == null) {
+            this.invoiceNumber = "INV-" + System.currentTimeMillis();
+        }
+        return invoiceNumber;
     }
 
     // Getters and Setters
@@ -93,12 +103,36 @@ public class Invoice {
         this.customer = customer;
     }
 
-    public List<InvoiceItem> getItems() {
-        return items;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setItems(List<InvoiceItem> items) {
-        this.items = items;
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     @Override
@@ -107,9 +141,10 @@ public class Invoice {
                 "id=" + id +
                 ", invoiceNumber='" + invoiceNumber + '\'' +
                 ", issueDate=" + issueDate +
-                ", customer=" + customer.getName() +
+                ", customer=" + (customer != null ? customer.getName() : "null") +
+                ", product=" + (product != null ? product.getName() : "null") +
+                ", quantity=" + quantity +
                 ", totalAmount=" + getTotalAmount() +
-                ", itemsCount=" + items.size() +
                 '}';
     }
 }

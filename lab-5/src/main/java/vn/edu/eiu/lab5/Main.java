@@ -127,39 +127,53 @@ public class Main {
         }
         
         Customer customer = customers.get(customerIndex);
-        Invoice invoice = invoiceService.createInvoice(customer.getId());
         
-        boolean addingItems = true;
-        while (addingItems) {
-            System.out.println("\n=== Add Products to Invoice ===");
-            listAllProducts();
-            
-            System.out.print("\nEnter product ID to add (or 0 to finish): ");
-            long productId = readLongInput();
-            
-            if (productId == 0) {
-                addingItems = false;
-                continue;
-            }
-            
-            System.out.print("Enter quantity: ");
-            int quantity = readIntInput();
-            
-            try {
-                invoiceService.addProductToInvoice(invoice.getId(), productId, quantity);
-                System.out.println("Product added to invoice.");
-                
-                // Refresh invoice to get updated items
-                invoice = invoiceService.findById(invoice.getId());
-                System.out.println(invoiceService.generateInvoiceText(invoice));
-                
-            } catch (Exception e) {
-                System.out.println("Error adding product: " + e.getMessage());
+        // List all products
+        List<Product> products = productService.findAll();
+        if (products.isEmpty()) {
+            System.out.println("No products found. Please add products first.");
+            return;
+        }
+        
+        System.out.println("\nSelect a product to invoice:");
+        listAllProducts();
+        
+        System.out.print("\nEnter product ID: ");
+        long productId = readLongInput();
+        
+        // Find the selected product
+        Product selectedProduct = null;
+        for (Product p : products) {
+            if (p.getId().equals(productId)) {
+                selectedProduct = p;
+                break;
             }
         }
         
-        System.out.println("\n=== Final Invoice ===");
-        System.out.println(invoiceService.generateInvoiceText(invoice));
+        if (selectedProduct == null) {
+            System.out.println("Invalid product selection.");
+            return;
+        }
+        
+        System.out.print("Enter quantity: ");
+        int quantity = readIntInput();
+        
+        if (quantity <= 0) {
+            System.out.println("Quantity must be greater than zero.");
+            return;
+        }
+        
+        try {
+            // Create and save the invoice
+            Invoice invoice = invoiceService.createInvoice(customer);
+            invoice = invoiceService.addProduct(invoice.getId(), productId, quantity);
+            
+            System.out.println("\n=== Invoice Created Successfully ===");
+            System.out.println(invoiceService.generateInvoiceText(invoice));
+            
+        } catch (Exception e) {
+            System.out.println("Error creating invoice: " + e.getMessage());
+        }
     }
 
     private static void viewCustomerInvoices() {
@@ -198,7 +212,7 @@ public class Main {
         System.out.println("\n=== Invoices for " + customer.getName() + " ===");
         for (Invoice invoice : invoices) {
             System.out.println(invoiceService.generateInvoiceText(invoice));
-            System.out.println("-".repeat(50));
+            System.out.println("-----------------------------");
         }
     }
 
