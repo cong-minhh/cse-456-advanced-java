@@ -22,7 +22,7 @@ public class Product {
     private BigDecimal price;
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InvoiceItem> invoiceItems = new ArrayList<>();
+    private List<Invoice> invoiceItems = new ArrayList<>();
 
     // Constructors
     public Product() {
@@ -67,11 +67,11 @@ public class Product {
         this.price = price;
     }
 
-    public List<InvoiceItem> getInvoiceItems() {
+    public List<Invoice> getInvoiceItems() {
         return invoiceItems;
     }
 
-    public void addInvoiceItem(InvoiceItem invoiceItem) {
+    public void addInvoiceItem(Invoice invoiceItem) {
         invoiceItems.add(invoiceItem);
         invoiceItem.setProduct(this);
     }
