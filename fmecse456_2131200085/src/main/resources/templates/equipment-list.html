@@ -1,0 +1,65 @@
+    <!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Equipment Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome">
+            <span>Welcome, <span class="username" th:text="${session.user.username}">username</span></span><br>
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+        <h1>Equipment Management</h1>
+        
+        <!-- Search Form -->
+        <form th:action="@{/equipment}" method="get">
+            <input type="text" name="keyword" placeholder="Search by equipment name...">
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Error Message -->
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        
+        <!-- Admin Actions -->
+        <div class="admin-actions" th:if="${session.user.role == 1}">
+            <a th:href="@{/equipment/new}" class="btn">Add New Equipment</a>
+            <a th:href="@{/equipment/top-by-type}" class="btn">View Top Equipment by Type</a>
+        </div>
+
+        <!-- Equipment List Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Equipment Name</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Purchase Date</th>
+                    <th th:if="${session.user.role == 1}">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="equipment : ${equipmentList}">
+                    <td th:text="${equipment.equipmentId}"></td>
+                    <td th:text="${equipment.equipmentName}"></td>
+                    <td th:text="${equipment.equipmentType.typeName}"></td>
+                    <td th:text="${#numbers.formatDecimal(equipment.purchasePrice, 1, 2)}"></td>
+                    <td th:text="${equipment.quantityAvailable}"></td>
+                    <td th:text="${#temporals.format(equipment.purchaseDate, 'dd/MM/yyyy')}"></td>
+                    <td th:if="${session.user.role == 1}">
+                        <a th:href="@{'/equipment/edit/' + ${equipment.equipmentId}}" class="btn-edit">Edit</a>
+                        <a th:href="@{'/equipment/delete/' + ${equipment.equipmentId}}" 
+                           class="btn-delete"
+                           onclick="return confirm('Are you sure you want to delete this equipment?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

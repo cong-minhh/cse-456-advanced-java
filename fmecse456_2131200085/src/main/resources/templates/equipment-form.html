@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${equipment.equipmentId} ? 'Edit Equipment' : 'Add New Equipment'">Equipment Form</title>
+    <link rel="stylesheet" th:href="@{/css/form-style.css}">
+</head>
+<body>
+    <div class="form-container">
+        <h1 th:text="${equipment.equipmentId} ? 'Edit Equipment' : 'Add New Equipment'">Equipment Form</h1>
+        
+        <!-- Error Messages -->
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        
+        <!-- Equipment Form -->
+        <form th:action="${equipment.equipmentId} ? @{/equipment/update} : @{/equipment/save}" 
+              th:object="${equipment}" 
+              method="post">
+            
+            <!-- Hidden ID for updates -->
+            <input type="hidden" th:field="*{equipmentId}">
+            
+            <div class="form-group">
+                <label for="equipmentType">Equipment Type</label>
+                <select id="equipmentType" th:field="*{equipmentType.equipmentTypeId}" required>
+                    <option value="">-- Select Type --</option>
+                    <option th:each="type : ${equipmentTypes}" 
+                            th:value="${type.equipmentTypeId}" 
+                            th:text="${type.typeName}"
+                            th:selected="${type.equipmentTypeId == equipment.equipmentType?.equipmentTypeId}">
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="equipmentName">Equipment Name</label>
+                <input type="text" id="equipmentName" th:field="*{equipmentName}" 
+                       placeholder="Enter equipment name" required 
+                       minlength="5" maxlength="100">
+                <small>Must be 5-100 characters long</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="purchasePrice">Purchase Price (VND)</label>
+                <input type="number" id="purchasePrice" th:field="*{purchasePrice}" 
+                       step="0.01" min="1000" required>
+                <small>Minimum 1000 VND</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantityAvailable">Quantity Available</label>
+                <input type="number" id="quantityAvailable" th:field="*{quantityAvailable}" 
+                       min="0" max="500" required>
+                <small>Must be between 0-500</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="purchaseDate">Purchase Date</label>
+                <input type="date" id="purchaseDate" th:field="*{purchaseDate}" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn">
+                    <span th:text="${equipment.equipmentId} ? 'Update' : 'Save'">Save</span>
+                </button>
+                <a th:href="@{/equipment}" class="btn btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

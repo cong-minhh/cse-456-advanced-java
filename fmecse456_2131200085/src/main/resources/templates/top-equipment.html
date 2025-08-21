@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Equipment by Type</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome">
+            <span>Welcome, <span class="username" th:text="${session.user.username}">username</span></span><br>
+            <a th:href="@{/equipment}">Back to Equipment List</a> | 
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+        <h1>Top 3 Equipment by Type</h1>
+        
+        <!-- Error Message -->
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        
+        <!-- Equipment by Type -->
+        <div th:each="type : ${equipmentTypes}" class="equipment-type-section">
+            <h2 th:text="'Type: ' + ${type.typeName}"></h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Equipment Name</th>
+                        <th>Quantity Available</th>
+                        <th>Price (VND)</th>
+                        <th>Purchase Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(type.topEquipment)}">
+                        <td colspan="5">No equipment found for this type</td>
+                    </tr>
+                    <tr th:each="equipment : ${type.topEquipment}">
+                        <td th:text="${equipment.equipmentId}"></td>
+                        <td th:text="${equipment.equipmentName}"></td>
+                        <td th:text="${equipment.quantityAvailable}"></td>
+                        <td th:text="${#numbers.formatDecimal(equipment.purchasePrice, 1, 2)}"></td>
+                        <td th:text="${#temporals.format(equipment.purchaseDate, 'dd/MM/yyyy')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
