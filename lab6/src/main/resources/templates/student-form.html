@@ -22,28 +22,51 @@
                     
                     <div class="mb-3">
                         <label for="name" class="form-label">Name *</label>
-                        <input type="text" class="form-control" id="name" th:field="*{name}" required>
-                        <div class="invalid-feedback">
-                            Please provide a valid name.
+                        <input type="text" class="form-control" id="name" th:field="*{name}" 
+                               th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                            Name validation error
                         </div>
+                        <div class="invalid-feedback" th:unless="${#fields.hasErrors('name')}">
+                            Please provide a valid name (5-100 characters, each word must start with uppercase).
+                        </div>
+                        <small class="form-text text-muted">Name must be 5-100 characters, each word must start with uppercase letter</small>
                     </div>
                     
                     <div class="mb-3">
                         <label for="yearOfBirth" class="form-label">Year of Birth *</label>
                         <input type="number" class="form-control" id="yearOfBirth" th:field="*{yearOfBirth}" 
-                               min="1900" max="2010" required>
-                        <div class="invalid-feedback">
-                            Please provide a valid year of birth (1900-2010).
+                               th:class="${#fields.hasErrors('yearOfBirth')} ? 'form-control is-invalid' : 'form-control'"
+                               min="1999" max="2006" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('yearOfBirth')}" th:errors="*{yearOfBirth}">
+                            Year of birth validation error
                         </div>
+                        <div class="invalid-feedback" th:unless="${#fields.hasErrors('yearOfBirth')}">
+                            Please provide a valid year of birth (1999-2006 for age 18-25).
+                        </div>
+                        <small class="form-text text-muted">Must be between 1999-2006 (age 18-25)</small>
                     </div>
                     
                     <div class="mb-3">
                         <label for="gpa" class="form-label">GPA *</label>
                         <input type="number" class="form-control" id="gpa" th:field="*{gpa}" 
-                               min="0" max="4" step="0.01" required>
-                        <div class="invalid-feedback">
-                            Please provide a valid GPA (0.00-4.00).
+                               th:class="${#fields.hasErrors('gpa')} ? 'form-control is-invalid' : 'form-control'"
+                               min="0" max="100" step="0.01" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('gpa')}" th:errors="*{gpa}">
+                            GPA validation error
                         </div>
+                        <div class="invalid-feedback" th:unless="${#fields.hasErrors('gpa')}">
+                            Please provide a valid GPA (0-100 scale).
+                        </div>
+                        <small class="form-text text-muted">GPA must be on 100-point scale (0-100)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="major" class="form-label">Major</label>
+                        <select class="form-select" id="major" th:field="*{major}">
+                            <option value="">Select a major</option>
+                            <option th:each="major : ${majors}" th:value="${major.majorId}" th:text="${major.majorName}">Major</option>
+                        </select>
                     </div>
                     
                     <div class="mb-3">
